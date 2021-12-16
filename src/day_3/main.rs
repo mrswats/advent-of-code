@@ -3,7 +3,9 @@ const BYTE_LENGTH: usize = 12;
 
 fn main() {
     let filename = "src/day_3/input.txt";
+    println!("Part1:");
     part1(filename);
+    println!("\nPart2:");
     part2(filename);
 }
 
@@ -11,11 +13,7 @@ fn part1(filename: &str) {
     let content = fs::read_to_string(filename).expect("Could not read the file :(");
     let mut report = vec![String::new(); BYTE_LENGTH];
 
-    for line in content.split("\n") {
-        if line == "" {
-            continue;
-        }
-
+    for line in content.lines() {
         for (i, c) in line.chars().enumerate() {
             report[i].push_str(&c.to_string());
         }
@@ -37,6 +35,7 @@ fn part1(filename: &str) {
             }
             .to_string(),
         );
+
         epsilon_rate.push_str(
             &{
                 if number_of_ones < number_of_zeros {
@@ -60,52 +59,29 @@ fn part1(filename: &str) {
 }
 
 fn part2(filename: &str) {
-    let content = fs::read_to_string(filename).expect("Could not read the file :(");
-    let mut report = vec![String::new(); BYTE_LENGTH];
+    let content =
+        fs::read_to_string(filename).expect("Something went wrong when reading the file :/");
+    let input = content.lines().collect::<Vec<&str>>();
 
-    for line in content.split("\n") {
-        if line == "" {
-            continue;
-        }
+    let mut o2_codes = input.clone();
+    let mut o2_rating = String::new();
+    let mut o2_gen_rating = "";
 
-        for (i, c) in line.chars().enumerate() {
-            report[i].push_str(&c.to_string());
-        }
-    }
-
-    let mut O2_gen = String::new();
-    let mut CO2_gen = String::new();
-
-    let mut O2_gen_rate = String::new();
-    let mut CO2_gen_rate = String::new();
+    let mut co2_codes = input.clone();
+    let mut co2_rating = String::new();
+    let mut co2_scrub_rating = "";
 
     for i in 0..BYTE_LENGTH {
-        let number_of_ones = report[i].matches('1').count();
-        let number_of_zeros = report[i].matches('0').count();
-        O2_gen.push_str(
-            &{
-                if number_of_ones > number_of_zeros {
-                    '1'
-                } else {
-                    '0'
-                }
-            }
-            .to_string(),
-        );
-
-        let code_in_report = report.map(|x| {
-            if x.starts_with(O2_gen) {
-                return x;
-            }
-        });
-
-        if code_in_report.len() == 1 {
-            O2_gen_rate = code_in_report.pop()
+        let mut o2_report = String::new();
+        for code in &o2_codes {
+            o2_report.push_str(&code.chars().nth(i).unwrap().to_string());
         }
+        let number_of_ones = { o2_report.matches('1').count() };
+        let number_of_zeros = { o2_report.matches('0').count() };
 
-        CO2_gen.push_str(
+        o2_rating.push_str(
             &{
-                if number_of_ones < number_of_zeros {
+                if number_of_ones >= number_of_zeros {
                     '1'
                 } else {
                     '0'
@@ -113,14 +89,62 @@ fn part2(filename: &str) {
             }
             .to_string(),
         );
+
+        let mut temp_codes = Vec::<&str>::new();
+
+        for code in &o2_codes {
+            if code.starts_with(&o2_rating) {
+                temp_codes.push(&code);
+            };
+        }
+        o2_codes = temp_codes.clone();
+
+        if o2_codes.len() == 1 && o2_gen_rating == "" {
+            o2_gen_rating = o2_codes[0];
+            break;
+        }
     }
 
-    let O2_gen_rate_dec = i64::from_str_radix(&O2_gen_rate, 2).unwrap();
-    let CO2_gen_rate_dec = i64::from_str_radix(&CO2_gen_rate, 2).unwrap();
+    for i in 0..BYTE_LENGTH {
+        let mut co2_report = String::new();
+        for code in &co2_codes {
+            co2_report.push_str(&code.chars().nth(i).unwrap().to_string());
+        }
+        let number_of_ones = { co2_report.matches('1').count() };
+        let number_of_zeros = { co2_report.matches('0').count() };
 
-    println!("Oxygen Generation rate: {O2_gen_rate_dec}, CO2 Generation rate: {CO2_gen_rate_dec}");
+        co2_rating.push_str(
+            &{
+                if number_of_ones >= number_of_zeros {
+                    '0'
+                } else {
+                    '1'
+                }
+            }
+            .to_string(),
+        );
+
+        let mut temp_codes = Vec::<&str>::new();
+
+        for code in &co2_codes {
+            if code.starts_with(&co2_rating) {
+                temp_codes.push(&code);
+            };
+        }
+        co2_codes = temp_codes.clone();
+
+        if co2_codes.len() == 1 && co2_scrub_rating == "" {
+            co2_scrub_rating = co2_codes[0];
+            break;
+        }
+    }
+
+    let o2_generation_rate_decimal = i64::from_str_radix(&o2_gen_rating, 2).unwrap();
+    let co2_scrubbing_rate_decimal = i64::from_str_radix(&co2_scrub_rating, 2).unwrap();
+
+    println!("Oxygen Generation Ragin: {o2_generation_rate_decimal}, CO2 Scrubbing Rate: {co2_scrubbing_rate_decimal}");
     println!(
         "Life support rating: {}",
-        O2_gen_rate_dec * CO2_gen_rate_dec
+        o2_generation_rate_decimal * co2_scrubbing_rate_decimal
     );
 }
