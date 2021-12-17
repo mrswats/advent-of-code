@@ -15,8 +15,7 @@ impl Board {
     fn new(board: NumberList) -> Board {
         Board {
             board,
-            // marked: vec![31, 27, 67, 13, 42],
-            marked: vec![31, 23, 52, 26, 8],
+            marked: vec![],
         }
     }
 
@@ -38,29 +37,43 @@ impl Board {
         self.board[self.index(col, row)]
     }
 
-    fn is_row_or_column(&self) -> bool {
-        // Check rows first
-        for row in 0..BOARD_SIZE {
-            let start = row * BOARD_SIZE;
+    fn is_win(&self) -> bool {
+        for pos in 0..BOARD_SIZE {
+            let start = pos * BOARD_SIZE;
             let end = start + BOARD_SIZE;
             // This is wrong to check for columns.
             // All the marked numbers should be contained in the LHS comparison
-            println!("{:?}", self.marked);
+            // Check rows first
             for val in &self.board[start as usize..end as usize] {
-                println!("{val}");
                 if !self.marked.contains(val) {
+                    return false;
+                }
+            }
+
+            let mut col = Vec::<i64>::new();
+
+            for val in 0..BOARD_SIZE {
+                col.push(self.board[self.index(pos, val)])
+            }
+
+            for val in col {
+                if !self.marked.contains(&val) {
                     return false;
                 }
             }
         }
 
-        // Check columns
-        for col in 0..BOARD_SIZE {
-            let index = 0;
-            // let column = vec![self.board[]];
-        }
-
         return true;
+    }
+
+    fn result(&self, last_number_called: &i64) -> i64 {
+        let mut sum = 0;
+        for number in &self.board {
+            if !self.marked.contains(&number) {
+                sum += number;
+            }
+        }
+        sum * last_number_called
     }
 }
 
@@ -80,13 +93,8 @@ fn parse_input(filename: &str) -> (NumberList, Boards) {
     // Second line we know it's empty
     for raw_board in &input[2..] {
         if *raw_board == "" {
-            let board = Board::new(tmp_board);
-            println!("{}", board.is_row_or_column());
-            boards.push(board);
-            tmp_board = vec![];
-            break;
             continue;
-        };
+        }
 
         let mut parsed_board = raw_board
             .split_whitespace()
@@ -94,15 +102,23 @@ fn parse_input(filename: &str) -> (NumberList, Boards) {
             .collect::<Vec<i64>>();
 
         tmp_board.append(&mut parsed_board);
+
+        if tmp_board.len() == 25 {
+            let board = Board::new(tmp_board);
+            boards.push(board);
+            tmp_board = vec![];
+        };
     }
+
     (number_lst, boards)
 }
 
 fn part1(filename: &str) {
-    let (numbers, boards) = parse_input(filename);
+    let (_numbers, _boards) = parse_input(filename);
 }
 
 fn main() {
-    let filename = "src/day_4/input.txt";
+    // let filename = "src/day_4/input.txt";
+    let filename = "src/day_4/test_input.txt";
     part1(filename);
 }
