@@ -84,7 +84,7 @@ fn parse_input(filename: &str) -> (NumberList, Boards) {
     let number_lst: NumberList = input[0]
         .split(",")
         .into_iter()
-        .map(|x| x.parse::<i64>().unwrap())
+        .filter_map(|x| x.parse::<i64>().ok())
         .collect();
 
     let mut boards = vec![];
@@ -98,8 +98,10 @@ fn parse_input(filename: &str) -> (NumberList, Boards) {
 
         let mut parsed_board = raw_board
             .split_whitespace()
-            .map(|x| x.parse::<i64>().unwrap())
+            .filter_map(|x| x.parse::<i64>().ok())
             .collect::<Vec<i64>>();
+
+        println!("{:?}", parsed_board);
 
         tmp_board.append(&mut parsed_board);
 
@@ -118,7 +120,7 @@ fn part1(filename: &str) {
 }
 
 fn main() {
-    // let filename = "src/day_4/input.txt";
     let filename = "src/day_4/test_input.txt";
+    let filename = "src/day_4/input.txt";
     part1(filename);
 }
