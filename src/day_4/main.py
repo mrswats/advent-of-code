@@ -55,10 +55,10 @@ def main() -> int:
                 if drawn_number in row:
                     row[drawn_number] = True
 
-        if check_cols(board) or check_rows(board):
-            print("BINGOOO!!!!!")
-            print(f"{calculate_score(board, drawn_number) = }")
-            break
+            if check_cols(board) or check_rows(board):
+                score = calculate_score(board, drawn_number)
+                print(f"{score = }")
+                return 0
 
     return 0
 
