@@ -49,16 +49,34 @@ def main() -> int:
 
     bingo_numbers, boards = parse_file(raw_input)
 
+    boards_which_have_won = []
+
     for drawn_number in bingo_numbers:
-        for board in boards:
+        for index, board in enumerate(boards):
             for row in board:
                 if drawn_number in row:
                     row[drawn_number] = True
 
-            if check_cols(board) or check_rows(board):
-                score = calculate_score(board, drawn_number)
-                print(f"{score = }")
-                return 0
+            if (
+                check_cols(board) or check_rows(board)
+            ) and board not in boards_which_have_won:
+                if len(boards_which_have_won) == len(boards) - 1:
+                    remaining_board = [
+                        board2
+                        for board2 in boards
+                        if board2 not in boards_which_have_won
+                    ]
+
+                    assert len(remaining_board) == 1
+
+                    last_winning_index = boards.index(remaining_board[0])
+                    score = calculate_score(remaining_board[0], drawn_number)
+                    print(
+                        f"Last board (number {last_winning_index}) has score of {score}"
+                    )
+
+                print(f"Board number {index} has won!")
+                boards_which_have_won.append(board)
 
     return 0
 
