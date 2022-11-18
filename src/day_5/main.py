@@ -1,10 +1,12 @@
 import argparse
 import re
 from dataclasses import dataclass
-from pprint import pprint as print
-from typing import Any, Sequence
+from typing import Sequence
 
 LINE_REGEX = r"(\d+),(\d+) -> (\d+),(\d+)"
+
+ROWS = 10
+COLS = 10
 
 
 @dataclass
@@ -18,15 +20,90 @@ class Vent:
     def is_diagonal(self) -> bool:
         return not (self.x1 == self.x2 or self.y1 == self.y2)
 
+    @property
+    def is_horizontal(self) -> bool:
+        return self.y1 == self.y2
+
+    @property
+    def is_vertical(self) -> bool:
+        return self.x1 == self.x2
+
+    def vect(self):
+        if self.is_horizontal:
+            return (
+                ((self.x1, self.y1), (self.x2, self.y2))
+                if self.x1 < self.x2
+                else ((self.x2, self.y2), (self.x1, self.y1))
+            )
+
+        if self.is_vertical:
+            return (
+                ((self.x1, self.y1), (self.x2, self.y2))
+                if self.y1 < self.y2
+                else ((self.x2, self.y2), (self.x1, self.y1))
+            )
+
+        return (self.x1, self.y1), (self.x2, self.y2)
+
     def __repr__(self) -> str:
         return f"Vent(({self.x1},{self.y1}) -> ({self.x2},{self.y2}))"
 
 
-def parse_input(filename: str) -> Any:
+def calculate_size(vents: list[Vent]) -> tuple[int, int]:
+    max_x = max([vent.x1 for vent in vents] + [vent.x2 for vent in vents])
+    max_y = max([vent.y1 for vent in vents] + [vent.y2 for vent in vents])
+
+    return max_x + 1, max_y + 1
+
+
+def populate_diagram(
+    vents: list[Vent], rows: int, cols: int
+) -> dict[tuple[int, int], int]:
+    empty_diagram = {(j, i): 0 for i in range(rows) for j in range(cols)}
+    for vent in vents:
+        if vent.is_diagonal:
+            continue
+
+        start, end = vent.vect()
+
+        if vent.is_horizontal:
+            x = start[0]
+            while x <= end[0]:
+                empty_diagram[(x, start[1])] += 1
+                x += 1
+
+        if vent.is_vertical:
+            y = start[1]
+            while y <= end[1]:
+                empty_diagram[(start[0], y)] += 1
+                y += 1
+
+    return empty_diagram
+
+
+def print_diagram(diagram: dict[tuple[int, int], int], nrow=ROWS, mcol=COLS) -> None:
+    for i in range(nrow):
+        for j in range(mcol):
+            val = diagram[(j, i)]
+            if val:
+                print(val, end=" ")
+            else:
+                print(".", end=" ")
+        print()
+
+
+def count_overlaps(diagram: dict[tuple[int, int], int]) -> int:
+    return sum(1 for val in diagram.values() if val > 1)
+
+
+def parse_input(filename: str) -> list[Vent]:
     with open(filename) as f:
         lines = f.readlines()
 
-    return [Vent(*re.findall(LINE_REGEX, line)[0]) for line in lines]
+    return [
+        Vent(*[int(coord) for coord in re.findall(LINE_REGEX, line).pop()])
+        for line in lines
+    ]
 
 
 def main(argv: Sequence[str] | None = None) -> int:
@@ -35,8 +112,12 @@ def main(argv: Sequence[str] | None = None) -> int:
     args = parser.parse_args(argv)
 
     vents = parse_input(args.filename)
+    rows, cols = calculate_size(vents)
+    diagram = populate_diagram(vents, rows, cols)
 
-    print(vents)
+    print_diagram(diagram, rows, cols)
+
+    print(f"Overlaps: {count_overlaps(diagram)}")
 
     return 0
 
