@@ -29,21 +29,17 @@ class Vent:
         return self.x1 == self.x2
 
     def vect(self):
+        v1 = self.x1, self.y1
+        v2 = self.x2, self.y2
+
         if self.is_horizontal:
-            return (
-                ((self.x1, self.y1), (self.x2, self.y2))
-                if self.x1 < self.x2
-                else ((self.x2, self.y2), (self.x1, self.y1))
-            )
+            return (v1, v2) if self.x1 < self.x2 else (v2, v1)
 
         if self.is_vertical:
-            return (
-                ((self.x1, self.y1), (self.x2, self.y2))
-                if self.y1 < self.y2
-                else ((self.x2, self.y2), (self.x1, self.y1))
-            )
+            return (v1, v2) if self.y1 < self.y2 else (v2, v1)
 
-        return (self.x1, self.y1), (self.x2, self.y2)
+        if self.is_diagonal:
+            return (v1, v2) if (self.x1 < self.x2) and (self.y1 < self.y2) else (v2, v1)
 
     def __repr__(self) -> str:
         return f"Vent(({self.x1},{self.y1}) -> ({self.x2},{self.y2}))"
@@ -60,10 +56,8 @@ def populate_diagram(
     vents: list[Vent], rows: int, cols: int
 ) -> dict[tuple[int, int], int]:
     empty_diagram = {(j, i): 0 for i in range(rows) for j in range(cols)}
-    for vent in vents:
-        if vent.is_diagonal:
-            continue
 
+    for vent in vents:
         start, end = vent.vect()
 
         if vent.is_horizontal:
@@ -76,6 +70,15 @@ def populate_diagram(
             y = start[1]
             while y <= end[1]:
                 empty_diagram[(start[0], y)] += 1
+                y += 1
+
+        if vent.is_diagonal:
+            x, y = start
+
+            # TODO handle the OTHER diagonal cases
+            while x <= end[0] and y <= end[1]:
+                empty_diagram[(x, y)] += 1
+                x += 1
                 y += 1
 
     return empty_diagram
