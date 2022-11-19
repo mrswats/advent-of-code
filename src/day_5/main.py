@@ -39,7 +39,14 @@ class Vent:
             return (v1, v2) if self.y1 < self.y2 else (v2, v1)
 
         if self.is_diagonal:
-            return (v1, v2) if (self.x1 < self.x2) and (self.y1 < self.y2) else (v2, v1)
+            return (
+                (v1, v2)
+                if (
+                    ((self.x1 < self.x2) and (self.y1 < self.y2))
+                    or ((self.x1 > self.x2) and (self.y1 < self.y2))
+                )
+                else (v2, v1)
+            )
 
     def __repr__(self) -> str:
         return f"Vent(({self.x1},{self.y1}) -> ({self.x2},{self.y2}))"
@@ -75,19 +82,14 @@ def populate_diagram(
         if vent.is_diagonal:
             x, y = start
 
-            # TODO handle the OTHER diagonal cases
-            # Determine what kind of diagonal is this
-            # Either x and y at the start are smaller
-            # or x is smaller and y is bigger
-            if False:  # some condition
+            if x < end[0] and y < end[1]:
                 while x <= end[0] and y <= end[1]:
                     empty_diagram[(x, y)] += 1
                     x += 1
                     y += 1
 
-            if False:  # some other condition
-                # from the top right to the bottom left
-                while x <= end[0] and y <= end[1]:
+            if x > end[0] and y < end[1]:
+                while x >= end[0] and y <= end[1]:
                     empty_diagram[(x, y)] += 1
                     x -= 1
                     y += 1
@@ -96,11 +98,11 @@ def populate_diagram(
 
 
 def print_diagram(diagram: dict[tuple[int, int], int], nrow=ROWS, mcol=COLS) -> None:
-    for i in range(nrow):
-        for j in range(mcol):
-            val = diagram[(j, i)]
-            if val:
-                print(val, end=" ")
+    for rowidx in range(nrow):
+        for colidx in range(mcol):
+            value = diagram[(colidx, rowidx)]
+            if value:
+                print(value, end=" ")
             else:
                 print(".", end=" ")
         print()
