@@ -76,10 +76,21 @@ def populate_diagram(
             x, y = start
 
             # TODO handle the OTHER diagonal cases
-            while x <= end[0] and y <= end[1]:
-                empty_diagram[(x, y)] += 1
-                x += 1
-                y += 1
+            # Determine what kind of diagonal is this
+            # Either x and y at the start are smaller
+            # or x is smaller and y is bigger
+            if False:  # some condition
+                while x <= end[0] and y <= end[1]:
+                    empty_diagram[(x, y)] += 1
+                    x += 1
+                    y += 1
+
+            if False:  # some other condition
+                # from the top right to the bottom left
+                while x <= end[0] and y <= end[1]:
+                    empty_diagram[(x, y)] += 1
+                    x -= 1
+                    y += 1
 
     return empty_diagram
 
