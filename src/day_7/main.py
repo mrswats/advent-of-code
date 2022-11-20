@@ -19,17 +19,10 @@ def main(argv: Sequence[str] | None = None) -> int:
     args = parser.parse_args(argv)
     crab_positions = parse_input(args.filename)
 
-    max_coord = max(crab_positions)
-
-    min_fuel = 10000000000000000000
-
-    for position in range(max_coord):
-        fuel = 0
-        for crab in crab_positions:
-            fuel += triangle(abs(crab - position))
-
-        if fuel < min_fuel:
-            min_fuel = fuel
+    min_fuel = min(
+        int(sum(triangle(abs(crab - position)) for crab in crab_positions))
+        for position in range(max(crab_positions))
+    )
 
     print(f"The calculated minimm amount of fuel is {min_fuel}")
 
