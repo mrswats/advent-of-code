@@ -9,6 +9,10 @@ def parse_input(filename: str) -> list[int]:
     return list(map(int, filecontents.split(",")))
 
 
+def triangle(n: int) -> int:
+    return 0.5 * n * (n + 1)
+
+
 def main(argv: Sequence[str] | None = None) -> int:
     parser = argparse.ArgumentParser()
     parser.add_argument("filename")
@@ -22,7 +26,7 @@ def main(argv: Sequence[str] | None = None) -> int:
     for position in range(max_coord):
         fuel = 0
         for crab in crab_positions:
-            fuel += abs(crab - position)
+            fuel += triangle(abs(crab - position))
 
         if fuel < min_fuel:
             min_fuel = fuel
