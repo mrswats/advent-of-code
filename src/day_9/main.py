@@ -31,39 +31,40 @@ def index(row: int, col: int) -> int:
     return col + row * WIDTH
 
 
-def find_minimal_heights(heatmap: list[int]):
+def find_minimal_heights(heatmap: list[(int, int)]):
     minimal_heights = []
     for row_idx in range(HEIGHT):
         for col_idx in range(WIDTH):
-            height = heatmap[index(row_idx, col_idx)]
+            current_index = index(row_idx, col_idx)
+            height = heatmap[current_index]
             if row_idx == TOP_EDGE and col_idx == LEFT_EDGE:
                 if is_minima(
                     height,
                     heatmap[index(row_idx, col_idx + 1)],
                     heatmap[index(row_idx + 1, col_idx)],
                 ):
-                    minimal_heights.append(height + 1)
+                    minimal_heights.append((current_index, height + 1))
             elif row_idx == TOP_EDGE and col_idx == RIGHT_EDGE:
                 if is_minima(
                     height,
                     heatmap[index(row_idx, col_idx - 1)],
                     heatmap[index(row_idx + 1, col_idx)],
                 ):
-                    minimal_heights.append(height + 1)
+                    minimal_heights.append((current_index, height + 1))
             elif row_idx == BOTTOM_EDGE and col_idx == LEFT_EDGE:
                 if is_minima(
                     height,
                     heatmap[index(row_idx, col_idx + 1)],
                     heatmap[index(row_idx - 1, col_idx)],
                 ):
-                    minimal_heights.append(height + 1)
+                    minimal_heights.append((current_index, height + 1))
             elif row_idx == BOTTOM_EDGE and col_idx == RIGHT_EDGE:
                 if is_minima(
                     height,
                     heatmap[index(row_idx, col_idx - 1)],
                     heatmap[index(row_idx - 1, col_idx)],
                 ):
-                    minimal_heights.append(height + 1)
+                    minimal_heights.append((current_index, height + 1))
             elif col_idx == LEFT_EDGE:
                 if is_minima(
                     height,
@@ -71,7 +72,7 @@ def find_minimal_heights(heatmap: list[int]):
                     heatmap[index(row_idx + 1, col_idx)],
                     heatmap[index(row_idx - 1, col_idx)],
                 ):
-                    minimal_heights.append(height + 1)
+                    minimal_heights.append((current_index, height + 1))
             elif col_idx == RIGHT_EDGE:
                 if is_minima(
                     height,
@@ -79,7 +80,7 @@ def find_minimal_heights(heatmap: list[int]):
                     heatmap[index(row_idx + 1, col_idx)],
                     heatmap[index(row_idx - 1, col_idx)],
                 ):
-                    minimal_heights.append(height + 1)
+                    minimal_heights.append((current_index, height + 1))
             elif row_idx == TOP_EDGE:
                 if is_minima(
                     height,
@@ -87,7 +88,7 @@ def find_minimal_heights(heatmap: list[int]):
                     heatmap[index(row_idx, col_idx + 1)],
                     heatmap[index(row_idx + 1, col_idx)],
                 ):
-                    minimal_heights.append(height + 1)
+                    minimal_heights.append((current_index, height + 1))
             elif row_idx == BOTTOM_EDGE:
                 if is_minima(
                     height,
@@ -95,7 +96,7 @@ def find_minimal_heights(heatmap: list[int]):
                     heatmap[index(row_idx, col_idx + 1)],
                     heatmap[index(row_idx - 1, col_idx)],
                 ):
-                    minimal_heights.append(height + 1)
+                    minimal_heights.append((current_index, height + 1))
             else:
                 if is_minima(
                     height,
@@ -104,7 +105,7 @@ def find_minimal_heights(heatmap: list[int]):
                     heatmap[index(row_idx - 1, col_idx)],
                     heatmap[index(row_idx + 1, col_idx)],
                 ):
-                    minimal_heights.append(height + 1)
+                    minimal_heights.append((current_index, height + 1))
     return minimal_heights
 
 
@@ -116,7 +117,7 @@ def main(argv: Sequence[str] | None = None) -> int:
 
     minimal_heights = find_minimal_heights(heatmap)
 
-    print(sum(minimal_heights))
+    print(sum(pos[1] for pos in minimal_heights))
 
     return 0
 
