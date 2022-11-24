@@ -1,5 +1,4 @@
 import argparse
-from collections import Counter, defaultdict
 from typing import Sequence
 
 ONE = 2
@@ -30,25 +29,14 @@ def main(argv: Sequence[str] | None = None) -> int:
     args = parser.parse_args(argv)
     parsed_input = parse_input(args.filename)
 
-    counter = defaultdict(int)
-
     for entry in parsed_input:
-        _, output = entry
-        for display in output:
-            number_of_segments = len(display)
+        numbers, output = entry
+        # with the numbers I can figure out what segments correspond
+        # to each letter which change for each line
 
-            if number_of_segments == ONE:
-                counter[1] += 1
-            elif number_of_segments == FOUR:
-                counter[4] += 1
-            elif number_of_segments == SEVEN:
-                counter[7] += 1
-            elif number_of_segments == EIGHT:
-                counter[8] += 1
-            else:
-                pass
+        # Then, with the dictionary, I can decode the output for each line
 
-    print(Counter(counter).total())
+        # Finally, transform all outputs to integer and summ them all up
 
     return 0
 
