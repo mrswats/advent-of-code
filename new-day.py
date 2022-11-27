@@ -1,29 +1,30 @@
 import argparse
 import os
 import shutil
+from datetime import datetime
 from typing import Sequence
 
-FOLDER_TEMPLATE = "day_{dayno}"
+
+def create_new_dir(dirname: str) -> bool:
+    if not os.path.exists(dirname):
+        os.mkdir(dirname)
+        print(f"Created {dirname}")
+        return True
+    else:
+        print("Folder already exists. Not overriding.")
+        return False
 
 
 def main(argv: Sequence[str] | None = None) -> int:
     parser = argparse.ArgumentParser()
-    parser.add_argument("day", type=int)
+    parser.add_argument("--day", type=int, default=datetime.now().day)
     args = parser.parse_args(argv)
 
-    dayno = args.day
-
-    folder_name = FOLDER_TEMPLATE.format(dayno=dayno)
-
+    folder_name = f"day_{args.day}"
     current_dir = os.getcwd()
-
     new_dir = f"{current_dir}/{folder_name}/"
 
-    if not os.path.exists(new_dir):
-        os.mkdir(new_dir)
-        print(f"Created {new_dir}")
-    else:
-        print("Folder already exists. Not overriding.")
+    if not create_new_dir(new_dir):
         return 1
 
     shutil.copy(f"{current_dir}/template.py", f"{new_dir}/main.py")
