@@ -1,8 +1,41 @@
 import argparse
 import os
+import re
 import shutil
+import urllib.request
 from datetime import datetime
 from typing import Sequence
+
+import markdownify
+
+PARSE_STATEMENT_REGEX = r'<article\s+class="day-desc">[\s\S]*?</article>'
+
+
+def get_headers() -> dict:
+    with open("./.env", "r") as f:
+        return {"Cookie": f.read().strip()}
+
+
+def download_problem_statement(year: int, day: int) -> str:
+    request = urllib.request.Request(
+        f"https://adventofcode.com/{year}/day/{day}",
+        method="GET",
+        headers=get_headers(),
+    )
+    response = urllib.request.urlopen(request)
+    raw_content = response.read().decode()
+    parsed = re.search(PARSE_STATEMENT_REGEX, raw_content)
+    return markdownify.markdownify(parsed.group()) if parsed else ""
+
+
+def download_input(year: int, day: int) -> str:
+    request = urllib.request.Request(
+        f"https://adventofcode.com/{year}/day/{day}/input",
+        method="GET",
+        headers=get_headers(),
+    )
+    response = urllib.request.urlopen(request)
+    return response.read().decode()
 
 
 def create_new_dir(dirname: str) -> bool:
@@ -17,7 +50,9 @@ def create_new_dir(dirname: str) -> bool:
 
 def main(argv: Sequence[str] | None = None) -> int:
     parser = argparse.ArgumentParser()
-    parser.add_argument("--day", type=int, default=datetime.now().day)
+    today = datetime.now()
+    parser.add_argument("--day", type=int, default=today.day)
+    parser.add_argument("--year", type=int, default=today.year)
     args = parser.parse_args(argv)
 
     folder_name = f"day_{args.day}"
@@ -29,6 +64,15 @@ def main(argv: Sequence[str] | None = None) -> int:
 
     shutil.copy(f"{current_dir}/template.py", f"{new_dir}/main.py")
     print(f"Copied `template.py` into ./{folder_name}/main.py")
+
+    raw_statement = download_problem_statement(args.year, args.day)
+    with open(f"{new_dir}/README.md", "w") as f:
+        f.write(raw_statement)
+
+    print(f"Dwoloading input for day {args.day}/{args.year}")
+    raw_input = download_input(args.year, args.day)
+    with open(f"{new_dir}/input.txt", "w") as f:
+        f.write(raw_input)
 
     return 0
 
