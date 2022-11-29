@@ -7,6 +7,19 @@ SEVEN = 3
 EIGHT = 7
 
 
+"""
+Segment wise:
+
+    7 - 1: top
+    5 - 1: top right
+    2 - 1: bottom right
+    8 - 0: middle
+    5 - 4 - 7: bottom
+    2 - 3: bottom left
+    9 - 2 - 1: top left
+"""
+
+
 def parse_input(filename: str) -> list[tuple[list[str]]]:
     with open(filename) as f:
         filecontents = f.readlines()
