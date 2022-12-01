@@ -13,7 +13,13 @@ PARSE_STATEMENT_REGEX = r'<article\s+class="day-desc">[\s\S]*?</article>'
 
 def get_headers() -> dict:
     with open("./.env", "r") as f:
-        return {"Cookie": f.read().strip()}
+        return {
+            "Cookie": f.read().strip(),
+            "User-Agent": (
+                "gitlab.com/mrswats/advent-of-code-2022 by @mswats"
+                " <ferran@jovell.dev>"
+            ),
+        }
 
 
 def download_problem_statement(year: int, day: int) -> str:
