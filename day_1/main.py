@@ -2,7 +2,7 @@ import argparse
 from typing import Sequence
 
 
-def parse_input(filename: str) -> list[str]:
+def parse_input(filename: str) -> list[list[int]]:
     with open(filename) as f:
         return [
             [int(snack) for snack in elf.split("\n")]
@@ -16,9 +16,18 @@ def main(argv: Sequence[str] | None = None) -> int:
     args = parser.parse_args(argv)
     raw_input = parse_input(args.filename)
 
-    total_calories = max(sum(elf) for elf in raw_input)
+    top_three: list[int] = []
 
-    print(total_calories)
+    for elf in raw_input:
+        calories_per_elf = sum(elf)
+        current_min = min(top_three) if top_three else 0
+
+        if calories_per_elf > current_min:
+            if current_min in top_three and len(top_three) == 3:
+                top_three.remove(current_min)
+            top_three.append(calories_per_elf)
+
+    print(sum(top_three))
 
     return 0
 
