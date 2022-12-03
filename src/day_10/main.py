@@ -2,14 +2,18 @@ import argparse
 from typing import Sequence
 
 points = {
-    ")": 3,
-    "]": 57,
-    "}": 1197,
-    ">": 25137,
+    ")": 1,
+    "]": 2,
+    "}": 3,
+    ">": 4,
 }
 
-OPENING = "([{<"
-CLOSING = ")]}>"
+symbols = {
+    "(": ")",
+    "[": "]",
+    "{": "}",
+    "<": ">",
+}
 
 
 def parse_input(filename: str) -> list[int]:
@@ -23,15 +27,15 @@ def main(argv: Sequence[str] | None = None) -> int:
     args = parser.parse_args(argv)
     raw_input = parse_input(args.filename)
 
-    total_score = 0
+    total_scores = []
 
     for line in raw_input:
         stack = []
         for char in line:
-            if char in OPENING:
+            if char in symbols.keys():
                 stack.append(char)
 
-            if char in CLOSING:
+            if char in symbols.values():
                 if (
                     (char == ")" and stack[-1] == "(")
                     or (char == "]" and stack[-1] == "[")
@@ -40,10 +44,17 @@ def main(argv: Sequence[str] | None = None) -> int:
                 ):
                     stack.pop()
                 else:
-                    total_score += points[char]
                     break
+        else:
+            completion_score = 0
+            for char in reversed(stack):
+                symbol_to_score = symbols[char]
+                completion_score *= 5
+                completion_score += points[symbol_to_score]
 
-    print(total_score)
+            total_scores.append(completion_score)
+
+    print(sorted(total_scores)[int((len(total_scores) - 1) / 2)])
 
     return 0
 
