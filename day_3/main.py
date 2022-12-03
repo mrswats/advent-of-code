@@ -14,16 +14,20 @@ def main(argv: Sequence[str] | None = None) -> int:
     args = parser.parse_args(argv)
     raw_input = parse_input(args.filename)
 
+    processed = []
+    inner = []
+
+    for index, line in enumerate(raw_input, start=1):
+        inner.append(line)
+        if index % 3 == 0:
+            processed.append(inner)
+            inner = []
+
     total_priority = 0
 
-    for ruckstack in raw_input:
-        total_items = int(len(ruckstack) / 2)
-        first_compartment, second_compartment = (
-            set(ruckstack[:total_items]),
-            set(ruckstack[total_items:]),
-        )
-
-        common_item = first_compartment & second_compartment
+    for ruckstack in processed:
+        bag1, bag2, bag3 = ruckstack
+        common_item = set(bag1) & set(bag2) & set(bag3)
         total_priority += string.ascii_letters.find(common_item.pop()) + 1
 
     print(total_priority)
