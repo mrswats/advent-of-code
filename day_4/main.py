@@ -30,7 +30,7 @@ def solve(raw_input: str) -> str | int:
             second_set = set(range(pair[0], pair[1] + 1))
             first_set = set(range(pair[2], pair[3] + 1))
 
-        if first_set | second_set == second_set:
+        if first_set & second_set:
             fully_contained += 1
 
     return fully_contained
