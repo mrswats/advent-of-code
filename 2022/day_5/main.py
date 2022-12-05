@@ -25,9 +25,10 @@ def solve(raw_input: str) -> str | int:
     ]
 
     for number_of_crates_to_move, origin_stack, destination_stack in movements:
+        crates_being_moved = crates[origin_stack][:number_of_crates_to_move]
         for _ in range(number_of_crates_to_move):
-            crate_being_moved = crates[origin_stack].pop(0)
-            crates[destination_stack] = [crate_being_moved] + crates[destination_stack]
+            crates[origin_stack].pop(0)
+        crates[destination_stack] = crates_being_moved + crates[destination_stack]
 
     return "".join(crates[stack + 1][0] for stack in range(len(crates)))
 
