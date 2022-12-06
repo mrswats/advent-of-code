@@ -4,7 +4,8 @@ from typing import Sequence
 INPUT = "input.txt"
 TEST_INPUT = "mjqjpqmgbljsphdztnvjfqwrcgsmlb"
 
-SLIDING_WINDOW_WIDTH = 4
+SLIDING_WINDOW_WIDTH_PART_1 = 4
+SLIDING_WINDOW_WIDTH = 14
 
 
 def solve(raw_input: str) -> str | int:
