@@ -16,8 +16,7 @@ def get_headers() -> dict:
         return {
             "Cookie": f.read().strip(),
             "User-Agent": (
-                "gitlab.com/mrswats/advent-of-code-2022 by @mswats"
-                " <ferran@jovell.dev>"
+                "gitlab.com/mrswats/advent-of-code/ by @mswats <ferran@jovell.dev>"
             ),
         }
 
