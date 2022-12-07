@@ -30,6 +30,8 @@ $ ls
 """
 
 MAX_FILE_SIZE = 100000
+TOTAL_DISK_SIZE = 70000000
+MINIMUM_DISK_SIZE = 30000000
 
 
 def printdir(current_dir: list[str]) -> str:
@@ -70,9 +72,17 @@ def solve(raw_input: str) -> str | int:
                 else total_sizes[printdir(f"{current_dir}{current_file[1]}/")]
             )
 
-    return sum(
-        dir_size for dir_size in total_sizes.values() if dir_size <= MAX_FILE_SIZE
-    )
+    unused_disk_space = TOTAL_DISK_SIZE - total_sizes["/"]
+
+    smallest_dir_size = TOTAL_DISK_SIZE
+    for current_dir_size in total_sizes.values():
+        if (
+            unused_disk_space + current_dir_size > MINIMUM_DISK_SIZE
+            and current_dir_size < smallest_dir_size
+        ):
+            smallest_dir_size = current_dir_size
+
+    return smallest_dir_size
 
 
 def read_file(filename: str) -> str:
