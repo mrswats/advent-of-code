@@ -1,4 +1,5 @@
 import argparse
+import functools
 from typing import Sequence
 
 INPUT = "input.txt"
@@ -11,6 +12,14 @@ TEST_INPUT = """\
 """
 
 
+def find_first_higher_tree(trees: list[int], tree_height: int) -> int:
+    for index, tree in enumerate(trees, start=1):
+        if tree >= tree_height:
+            return index
+
+    return len(trees)
+
+
 def solve(raw_input: str) -> str | int:
     """Parse the input into a matrix.
 
@@ -18,31 +27,32 @@ def solve(raw_input: str) -> str | int:
     The second index represent COLUMNS
     """
     trees = [list(map(int, line)) for line in raw_input.strip().split("\n")]
-    perimeter_trees = 2 * (len(trees[0]) + len(trees) - 2)
-
-    visible_trees = 0
     width = len(trees[0]) - 1
     height = len(trees) - 1
+
+    max_scenic_score = 0
 
     for row in range(1, height):
         for column in range(1, width):
             current_tree_heigt = trees[row][column]
             to_the_left = trees[row][:column]
+            to_the_left.reverse()
             to_the_right = trees[row][column + 1 :]
             to_the_top = [trees[i][column] for i in range(0, row)]
+            to_the_top.reverse()
             to_the_bottom = [trees[i][column] for i in range(row + 1, height + 1)]
 
-            if (
-                all(current_tree_heigt > tree_height for tree_height in to_the_left)
-                or all(current_tree_heigt > tree_height for tree_height in to_the_right)
-                or all(current_tree_heigt > tree_height for tree_height in to_the_top)
-                or all(
-                    current_tree_heigt > tree_height for tree_height in to_the_bottom
-                )
-            ):
-                visible_trees += 1
+            scenic_score = [
+                find_first_higher_tree(iterable, current_tree_heigt)
+                for iterable in (to_the_left, to_the_right, to_the_top, to_the_bottom)
+            ]
 
-    return visible_trees + perimeter_trees
+            computed_scenic_score = functools.reduce(lambda a, b: a * b, scenic_score)
+
+            if max_scenic_score < computed_scenic_score:
+                max_scenic_score = computed_scenic_score
+
+    return max_scenic_score
 
 
 def read_input(filename: str) -> str:
