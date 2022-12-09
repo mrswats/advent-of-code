@@ -1,8 +1,7 @@
 from __future__ import annotations
 
 import argparse
-from dataclasses import dataclass
-from math import floor, sqrt
+from math import sqrt
 from typing import Sequence
 
 INPUT = "input.txt"
@@ -18,81 +17,48 @@ R 2
 """
 
 
-@dataclass
-class Position:
-    xpos: int = 0
-    ypos: int = 0
-
-    def __add__(self, other: Position) -> Position:
-        return Position(xpos=self.xpos + other.xpos, ypos=self.ypos + other.ypos)
-
-    def __iadd__(self, other: Position) -> Position:
-        return self + other
-
-    def __hash__(self):
-        return hash((self.xpos, self.ypos))
-
-    def __repr__(self) -> str:
-        return f"({self.xpos}, {self.ypos})"
-
-    def is_diagonal(self, other: Position) -> bool:
-        return self.xpos != other.xpos and self.ypos != other.ypos
-
-
-directions = {
-    "R": Position(1, 0),
-    "L": Position(-1, 0),
-    "U": Position(0, 1),
-    "D": Position(0, -1),
+D = {
+    "R": (1, 0),
+    "L": (-1, 0),
+    "U": (0, 1),
+    "D": (0, -1),
 }
 
 
-def distance(p_point: Position, q_point: Position) -> int:
-    return floor(
-        sqrt((p_point.xpos - q_point.xpos) ** 2 + (p_point.ypos - q_point.ypos) ** 2)
-    )
+def dist(p: tuple[int, int], q: tuple[int, int]) -> float:
+    return sqrt((p[0] - q[0]) ** 2 + (p[1] - q[1]) ** 2)
 
 
-def movement(direction: Position, quantity: int) -> Position:
-    position = Position(0, 0)
-    for _ in range(quantity):
-        position += direction
-
-    return position
-
-
-def parse_input(raw_input: str) -> list[tuple[str, int]]:
-    return [
-        (splitline[0], int(splitline[1]))
-        for line in raw_input.splitlines()
-        if (splitline := line.split(" "))
-    ]
+def move(position: tuple[int, int], direction: tuple[int, int]) -> tuple[int, int]:
+    return (position[0] + direction[0], position[1] + direction[1])
 
 
 def solve(parsed_input: list[tuple[str, int]]) -> str | int:
-    head, tail = Position(0, 0), Position(0, 0)
+    head = tail = (0, 0)
     tail_visits = {tail}
+
     last_direction = None
 
-    for direction, quantity in parsed_input:
-        for _ in range(quantity):
+    for dir_s, quantity in parsed_input:
+        direction = D[dir_s]
 
-            if direction == "D" and quantity == 2:
-                breakpoint()
+        for _ in range(int(quantity)):
+            head = move(head, direction)
 
-            head += directions[direction]
+            if dist(head, tail) > 1:
+                if head[0] != tail[0] and head[1] != tail[1]:
+                    tail = move(tail, last_direction)
 
-            if distance(head, tail) > 1:
-                if head.is_diagonal(tail):
-                    tail += last_direction
-
-                tail += directions[direction]
+                tail = move(tail, direction)
                 tail_visits.add(tail)
 
-        assert distance(head, tail) < 2, (direction, quantity)
-        last_direction = directions[direction]
+        last_direction = direction
 
     return len(tail_visits)
+
+
+def parse_input(raw_input: str) -> list[tuple[str, int]]:
+    return [line.split(" ") for line in raw_input.splitlines()]
 
 
 def read_file(filename: str) -> str:
