@@ -156,13 +156,17 @@ noop
 NOOP = "noop"
 ADDX = "addx"
 
+SCREEEN_WIDTH = 40
+
 
 def solve(parsed_data: str) -> str | int:
     registry_x = 1
     cycle = 1
-    signal_strength = 0
 
     addx_cycle = True
+
+    print()
+    print("  ", end="")
 
     while True:
         if addx_cycle:
@@ -170,23 +174,31 @@ def solve(parsed_data: str) -> str | int:
 
         op = instruction[0]
 
+        print(
+            "#" if registry_x <= cycle % SCREEEN_WIDTH <= registry_x + 2 else ".",
+            end="",
+        )
+
         if op == NOOP:
             pass
         elif op == ADDX and addx_cycle:
             addx_cycle = False
-        else:
+        elif op == ADDX and not addx_cycle:
             addx_cycle = True
             registry_x += int(instruction[1])
+        else:
+            raise AssertionError("Unkwown instruction")
+
+        if cycle % SCREEEN_WIDTH == 0:
+            print()
+            print("  ", end="")
 
         cycle += 1
 
-        if cycle in [20, 60, 100, 140, 180, 220]:
-            signal_strength += cycle * registry_x
+        if not parsed_data:
+            break
 
-            if cycle >= 220:
-                break
-
-    return signal_strength
+    return ""
 
 
 def parse_input(raw_input: str) -> Any:
