@@ -1,4 +1,5 @@
 import argparse
+import heapq
 from typing import Sequence
 
 
@@ -15,19 +16,7 @@ def main(argv: Sequence[str] | None = None) -> int:
     parser.add_argument("filename")
     args = parser.parse_args(argv)
     raw_input = parse_input(args.filename)
-
-    top_three: list[int] = []
-
-    for elf in raw_input:
-        calories_per_elf = sum(elf)
-        current_min = min(top_three) if top_three else 0
-
-        if calories_per_elf > current_min:
-            if current_min in top_three and len(top_three) == 3:
-                top_three.remove(current_min)
-            top_three.append(calories_per_elf)
-
-    print(sum(top_three))
+    print(sum(heapq.nlargest(3, (sum(elf) for elf in raw_input))))
 
     return 0
 
