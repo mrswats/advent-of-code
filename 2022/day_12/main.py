@@ -3,7 +3,8 @@ from __future__ import annotations
 import argparse
 from dataclasses import dataclass
 from math import inf
-from typing import Any, Sequence, Set
+from pprint import pprint as print
+from typing import Sequence, Set
 
 INPUT = "input.txt"
 TEST_INPUT = """\
@@ -30,6 +31,11 @@ class Node:
     dist: int = inf
     visited = False
     prev: Node | None = None
+
+    def __repr__(self) -> str:
+        return (
+            f"Node({self.node_id=}, pos=({self.pos_x}, {self.pos_y}), {self.height=})"
+        )
 
 
 def neighbours(row_idx: int, col_idx: int) -> Set[int]:
@@ -102,13 +108,13 @@ def find_by_coordinates(nodes: list[Node], x_coord: int, y_coord: int) -> Node:
             return node
 
 
-def solve(heightmap: list[str]) -> str | int:
+def solve(heightmap: str) -> str | int:
     nodes = []
 
     def node_id(row: int, col: int) -> int:
-        return col * len(heightmap[0]) + row
+        return row * len(heightmap.splitlines()) + col
 
-    for rowidx, row in enumerate(heightmap):
+    for rowidx, row in enumerate(heightmap.splitlines()):
         for colidx, col in enumerate(row):
             nodes.append(
                 Node(
@@ -122,24 +128,30 @@ def solve(heightmap: list[str]) -> str | int:
 
     end_node = find_destination(nodes)
     start_node = nodes[0]
+    start_node.visited = True
     assert start_node.node_id == 0, start_node.node_id
 
-    prev_node: Node | None = None
     neighbour_nodes = [start_node]
 
     while neighbour_nodes:
         current_node = neighbour_nodes.pop(0)
-        current_node.visited = True
+
+        print(current_node)
 
         if current_node == end_node:
-            current_node.prev = prev_node
             break
 
-        for neighbour in neighbours(current_node.pos_y, current_node.pos_y):
+        for neighbour in neighbours(current_node.pos_x, current_node.pos_y):
             neighbour_node = find_by_coordinates(nodes, *neighbour)
-            raise NotImplemented("TODO!")
-
-        prev_node = current_node
+            if (
+                neighbour_node is not None
+                and not neighbour_node.visited
+                and 0 <= current_node.height - neighbour_node.height <= 1
+            ):
+                neighbour_node.visited = True
+                neighbour_node.dist = mdist(neighbour_node, end_node)
+                neighbour_node.prev = current_node
+                neighbour_nodes.append(neighbour_node)
 
     return nodes
 
