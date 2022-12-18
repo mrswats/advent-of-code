@@ -2,7 +2,8 @@ from __future__ import annotations
 
 import argparse
 import json
-from typing import Any, Sequence
+from pprint import pprint as print
+from typing import Any, Callable, Iterable, Sequence
 
 INPUT = "input.txt"
 TEST_INPUT = """\
@@ -32,7 +33,30 @@ TEST_INPUT = """\
 """
 
 
-def compare(left: int | list, right: int | list) -> bool | None:
+Signal = int | list
+
+
+def bubble_sort(
+    iterable: Iterable[Any],
+    key: Callable[[Signal, Signal], bool],
+) -> Iterable[Any]:
+    ietrable_length = len(iterable)
+
+    while True:
+        swapped = False
+        for i in range(1, ietrable_length):
+            if key(iterable[i - 1], iterable[i]):
+                iterable[i], iterable[i - 1] = iterable[i - 1], iterable[i]
+                swapped = True
+        ietrable_length = ietrable_length - 1
+
+        if not swapped:
+            break
+
+    return iterable
+
+
+def compare(left: Signal, right: Signal) -> bool | None:
     for left_signal, right_signal in zip(left, right):
         result = None
 
@@ -59,18 +83,15 @@ def compare(left: int | list, right: int | list) -> bool | None:
 
 
 def solve(parsed_data: str) -> int:
-    indices = [
-        index for index, block in enumerate(parsed_data, start=1) if compare(*block)
-    ]
+    marker_1, marker_2 = [[2]], [[6]]
+    signals = [*parsed_data, marker_1, marker_2]
+    sorted_signals = bubble_sort(signals, key=lambda left, right: compare(right, left))
 
-    return sum(indices)
+    return (sorted_signals.index(marker_1) + 1) * (sorted_signals.index(marker_2) + 1)
 
 
 def parse_input(raw_input: str) -> Any:
-    return [
-        [json.loads(line) for line in block.splitlines()]
-        for block in raw_input.split("\n\n")
-    ]
+    return [json.loads(line) for line in raw_input.splitlines() if line]
 
 
 def read_input_file(filename: str) -> str:
