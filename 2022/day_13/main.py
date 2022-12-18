@@ -33,14 +33,14 @@ TEST_INPUT = """\
 """
 
 
-Signal = int | list
+Signal = int | list["Signal"]
 
 
 def bubble_sort(
     iterable: Iterable[Any],
     key: Callable[[Signal, Signal], bool],
 ) -> Iterable[Any]:
-    ietrable_length = len(iterable)
+    ietrable_length: int = len(iterable)
 
     while True:
         swapped = False
