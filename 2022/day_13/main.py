@@ -32,8 +32,38 @@ TEST_INPUT = """\
 """
 
 
+def compare(left: int | list, right: int | list) -> bool | None:
+    for left_signal, right_signal in zip(left, right):
+        result = None
+
+        if isinstance(left_signal, int) and isinstance(right_signal, int):
+            if left_signal == right_signal:
+                continue
+            else:
+                return left_signal < right_signal
+
+        elif isinstance(left_signal, list) and isinstance(right_signal, list):
+            result = compare(left_signal, right_signal)
+
+        elif isinstance(left_signal, int) and isinstance(right_signal, list):
+            result = compare([left_signal], right_signal)
+
+        elif isinstance(left_signal, list) and isinstance(right_signal, int):
+            result = compare(left_signal, [right_signal])
+
+        if isinstance(result, bool):
+            return result
+
+    if len(left) != len(right):
+        return len(left) < len(right)
+
+
 def solve(parsed_data: str) -> int:
-    return 0
+    indices = [
+        index for index, block in enumerate(parsed_data, start=1) if compare(*block)
+    ]
+
+    return sum(indices)
 
 
 def parse_input(raw_input: str) -> Any:
