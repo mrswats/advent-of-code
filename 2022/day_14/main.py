@@ -55,9 +55,43 @@ def build_cave(parsed_data: str) -> dict[Point, str]:
 
 def solve(parsed_data: str) -> str | int:
     cave = build_cave(parsed_data)
+    min_x = min(point[0] for point in cave.keys())
+    max_x = max(point[0] for point in cave.keys())
+    max_y = max(point[1] for point in cave.keys())
+
+    sand = 0
+    falling_forever = False
+
+    while not falling_forever:
+        sand += 1
+
+        current_pos = (500, 0)
+
+        while True:
+            next_down = (current_pos[0], current_pos[1] + 1)
+            next_down_left = (current_pos[0] - 1, current_pos[1] + 1)
+            next_down_right = (current_pos[0] + 1, current_pos[1] + 1)
+
+            if (
+                min_x > current_pos[0]
+                or current_pos[0] > max_x
+                or current_pos[1] > max_y
+            ):
+                falling_forever = True
+                break
+            elif next_down not in cave:
+                current_pos = next_down
+            elif next_down_left not in cave:
+                current_pos = next_down_left
+            elif next_down_right not in cave:
+                current_pos = next_down_right
+            else:
+                cave[current_pos] = "o"
+                break
+
     print_cave(cave)
 
-    return 0
+    return sand - 1
 
 
 def parse_input(raw_input: str) -> Any:
