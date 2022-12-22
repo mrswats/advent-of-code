@@ -30,6 +30,7 @@ class Valve:
     label: str
     flow_rae: int
     neighbours: tuple[str]
+    is_open: bool = False
 
 
 def find_by_id(valves: list[Valve], label: str) -> Optional[Valve]:
@@ -41,16 +42,17 @@ def find_by_id(valves: list[Valve], label: str) -> Optional[Valve]:
 
 
 def solve(valves: str) -> str | int:
-    print(valves)
+    start_valve = valves["AA"]
+
     return ""
 
 
 def parse_input(raw_input: str) -> Any:
-    valves = []
+    valves = {}
 
     for line in raw_input.splitlines():
         label, flow_rate, neighbours = PARSE_VALVE_RE.findall(line).pop()
-        valves.append(Valve(label, int(flow_rate), tuple(neighbours.split(","))))
+        valves[label] = Valve(label, int(flow_rate), tuple(neighbours.split(", ")))
 
     return valves
 
