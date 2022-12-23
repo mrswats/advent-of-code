@@ -51,28 +51,56 @@ class Sensor(Beacon):
 Grid = dict[Tuple[int, int], Beacon | Sensor]
 
 
-def solve(grid: Grid, yval: int) -> int:
+def neighbours(x, y) -> Tuple[Tuple[int, int]]:
+    return (
+        (x + 1, y - 1),
+        (x + 1, y),
+        (x + 1, y + 1),
+        (x, y + 1),
+        (x - 1, y + 1),
+        (x - 1, y),
+        (x - 1, y - 1),
+        (x, y - 1),
+    )
 
-    count = 0
 
-    y = yval
-
+def solve(grid: Grid, max_coord: int) -> int:
     sensors = [sensor for sensor in grid.values() if isinstance(sensor, Sensor)]
 
-    xmax = max(sensor.xpos + sensor.radius for sensor in sensors)
-    xmin = min(sensor.xpos - sensor.radius for sensor in sensors)
+    xmin = ymin = 0
+    xmax = max(sensor.xpos for sensor in sensors)
+    ymax = max(sensor.ypos for sensor in sensors)
 
-    for x in range(xmin, xmax + 1):
+    seen = set()
 
-        if (x, y) in grid:
+    for sensor in sensors:
+        x, y = (sensor.closest.xpos, sensor.closest.ypos)
+
+        if not (xmin < x < xmax and ymin < y < ymax):
             continue
 
-        for sensor in sensors:
-            if sensor.mdist(x, y) <= sensor.radius:
-                count += 1
-                break
+        todo = [(x, y)]
 
-    return count
+        while todo:
+            current = todo.pop(0)
+
+            if current in seen:
+                continue
+            else:
+                seen.add(current)
+
+            for coord in neighbours(*current):
+                if (
+                    not all(
+                        sensor.radius < sensor.mdist(*coord) <= sensor.radius + 2
+                        for sensor in sensors
+                    )
+                    and xmin < x < xmax
+                    and ymin < y < ymax
+                ):
+                    todo.append(coord)
+
+    return x * max_coord + y
 
 
 def parse_input(raw_input: str) -> Grid:
@@ -96,8 +124,8 @@ def main(argv: Sequence[str] | None = None) -> int:
     parser.add_argument("--test", action=argparse.BooleanOptionalAction, default=True)
     args = parser.parse_args(argv)
     raw_input = TEST_INPUT if args.test else read_input_file(INPUT)
-    yval = 10 if args.test else 2000000
-    print(solve(parse_input(raw_input), yval))
+    max_coord = 20 if args.test else 4000000
+    print(solve(parse_input(raw_input), max_coord))
 
     return 0
 
