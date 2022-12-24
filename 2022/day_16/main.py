@@ -2,8 +2,7 @@ from __future__ import annotations
 
 import argparse
 import re
-from dataclasses import dataclass
-from typing import Any, Optional, Sequence
+from typing import NamedTuple, Sequence, Tuple
 
 INPUT = "input.txt"
 TEST_INPUT = """\
@@ -25,29 +24,42 @@ PARSE_VALVE_RE = re.compile(
 )
 
 
-@dataclass
-class Valve:
+class Valve(NamedTuple):
     label: str
-    flow_rae: int
-    neighbours: tuple[str]
-    is_open: bool = False
+    flow_rate: int
+    neighbours: Tuple[str]
 
 
-def find_by_id(valves: list[Valve], label: str) -> Optional[Valve]:
-    for valve in valves:
-        if valve.label == label:
-            return valve
+def solve(valves: dict[str, Valve]) -> int:
+    remaining_time = 30
+    cost = 0
 
-    return
+    todo = [valves["AA"]]
+    open = set()
+
+    while todo:
+        current = todo.pop(0)
+        remaining_time -= 1
+        cost += sum(valve.flow_rate for valve in open)
+        todo = []
+
+        for adj in current.neighbours:
+            todo.append(valves[adj])
+
+        todo.sort(key=lambda valve: valve.flow_rate * remaining_time, reverse=True)
+
+        if current.flow_rate != 0:
+            open.add(current)
+            remaining_time -= 1
+
+        cost += sum(valve.flow_rate for valve in open)
+
+        print(current)
+
+    return cost
 
 
-def solve(valves: str) -> str | int:
-    start_valve = valves["AA"]
-
-    return ""
-
-
-def parse_input(raw_input: str) -> Any:
+def parse_input(raw_input: str) -> dict[str, Valve]:
     valves = {}
 
     for line in raw_input.splitlines():
