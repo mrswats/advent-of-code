@@ -3,7 +3,7 @@ from __future__ import annotations
 import argparse
 import re
 from dataclasses import dataclass, field
-from typing import Sequence, Tuple
+from typing import Dict, Sequence, Tuple
 
 INPUT = "input.txt"
 TEST_INPUT = """\
@@ -43,73 +43,84 @@ class Sensor(Beacon):
     radius: int = field(init=False)
 
     def __post_init__(self) -> None:
-        self.radius = abs(self.xpos - self.closest.xpos) + abs(
-            self.ypos - self.closest.ypos
-        )
+        self.radius = self.mdist(self.closest.xpos, self.closest.ypos)
 
 
-Grid = dict[Tuple[int, int], Beacon | Sensor]
+Point = Tuple[int, int]
+Grid = Dict[Point, Beacon | Sensor]
 
 
-def neighbours(x, y) -> Tuple[Tuple[int, int]]:
+def neighbours(x: int, y: int) -> Tuple[Point, ...]:
     return (
-        (x + 1, y - 1),
         (x + 1, y),
-        (x + 1, y + 1),
-        (x, y + 1),
-        (x - 1, y + 1),
         (x - 1, y),
-        (x - 1, y - 1),
+        (x, y + 1),
         (x, y - 1),
     )
 
 
+def tuning_freq(xpos: int, ypos: int) -> int:
+    return xpos * 4000000 + ypos
+
+
 def solve(grid: Grid, max_coord: int) -> int:
     sensors = [sensor for sensor in grid.values() if isinstance(sensor, Sensor)]
+    beacons = [beacon for beacon in grid.values() if isinstance(beacon, Beacon)]
 
     xmin = ymin = 0
     xmax = max(sensor.xpos for sensor in sensors)
     ymax = max(sensor.ypos for sensor in sensors)
 
+    def in_bounds(xpos: int, ypos: int) -> bool:
+        return (xmin < xpos < xmax) and (ymin < ypos < ymax)
+
+    print(f"Bounds {xmin, xmax}, {ymin, ymax}")
+
+    candidate = None
     seen = set()
 
-    for sensor in sensors:
-        x, y = (sensor.closest.xpos, sensor.closest.ypos)
+    for beacon in beacons:
+        todo = [(beacon.xpos, beacon.ypos)]
 
-        if not (xmin < x < xmax and ymin < y < ymax):
-            continue
-
-        todo = [(x, y)]
+        print(f"Checking around sensor: {beacon}")
 
         while todo:
             current = todo.pop(0)
 
-            if current in seen:
+            if current in seen or not in_bounds(*current):
                 continue
             else:
                 seen.add(current)
 
-            for coord in neighbours(*current):
-                if (
-                    not all(
-                        sensor.radius < sensor.mdist(*coord) <= sensor.radius + 2
-                        for sensor in sensors
-                    )
-                    and xmin < x < xmax
-                    and ymin < y < ymax
-                ):
-                    todo.append(coord)
+            todo.extend(
+                [
+                    next
+                    for next in neighbours(*current)
+                    if next not in seen or in_bounds(*next)
+                ]
+            )
 
-    return x * max_coord + y
+            if all(
+                sensor.radius < sensor.mdist(*current) for sensor in sensors
+            ) and in_bounds(*current):
+                print(f"possible candidate 👀: {current}")
+                candidate = current
+                break
+
+        if candidate:
+            break
+
+    return tuning_freq(*candidate) if candidate else 0
 
 
 def parse_input(raw_input: str) -> Grid:
-    grid = {}
+    grid: Grid = {}
+
     for line in raw_input.splitlines():
         x, y, *closest = tuple(map(int, SENSOR_LOCATION_RE.findall(line).pop()))
         beacon = Beacon(*closest)
         grid[x, y] = Sensor(x, y, beacon)
-        grid[tuple(closest)] = beacon
+        grid[beacon.xpos, beacon.ypos] = beacon
 
     return grid
 
