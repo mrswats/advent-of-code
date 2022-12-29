@@ -2,7 +2,7 @@ from __future__ import annotations
 
 import argparse
 import re
-from typing import NamedTuple, Sequence, Tuple
+from typing import List, NamedTuple, Sequence, Tuple
 
 INPUT = "input.txt"
 TEST_INPUT = """\
@@ -30,33 +30,116 @@ class Valve(NamedTuple):
     neighbours: Tuple[str]
 
 
-def solve(valves: dict[str, Valve]) -> int:
-    remaining_time = 30
-    cost = 0
+""" IDEA:
+    - order all the valves per decreasing rate
+    - find all the paths between the valves in order.
+    - Along the way, open every valve you encounter.
+"""
 
-    todo = [valves["AA"]]
-    open = set()
+
+def find_path(start: str, end: str, valves: dict[str, Valve]) -> List[str]:
+
+    todo = [valves[start]]
+    seen = set()
+
+    come_from = {start: None}
 
     while todo:
         current = todo.pop(0)
+
+        if current.label == end:
+            break
+        elif current in seen:
+            continue
+        else:
+            seen.add(current)
+
+        for neigh in current.neighbours:
+            if valves[neigh] not in seen:
+                come_from[neigh] = current.label
+                todo.append(valves[neigh])
+
+    path = []
+    node = end
+
+    while node is not None:
+        path.append(node)
+        node = come_from[node]
+
+    return list(reversed(path))
+
+
+def find_valves_order(valves: dict[str, Valve]) -> List[str]:
+    valves_by_rate = sorted(
+        (valve for valve in valves.values() if valve.flow_rate),
+        key=lambda valve: valve.flow_rate,
+        reverse=True,
+    )
+
+    valves_path = find_path("AA", valves_by_rate[0].label, valves)
+    seen_valves = set(valves_path)
+
+    while True:
+        start = valves_path[-1]
+        next_end_valve = [
+            valve.label for valve in valves_by_rate if valve.label not in seen_valves
+        ]
+
+        if not next_end_valve:
+            break
+
+        end = next_end_valve[0]
+        path = find_path(start, end, valves)
+
+        valves_path.extend(path[1:])
+
+        for step in path:
+            seen_valves.add(step)
+
+        if seen_valves == set(valves.values()):
+            break
+
+    return valves_path
+
+
+def solve(valves: dict[str, Valve]) -> int:
+    valves_path = find_valves_order(valves)
+    valves_path = [
+        "AA",
+        "DD",
+        "CC",
+        "BB",
+        "AA",
+        "II",
+        "JJ",
+        "II",
+        "AA",
+        "DD",
+        "EE",
+        "FF",
+        "GG",
+        "HH",
+        "GG",
+        "FF",
+        "EE",
+        "DD",
+        "CC",
+    ]
+    remaining_time = 30
+    relieved_pressure = 0
+
+    opened_valves = set()
+
+    for valve_label in valves_path:
         remaining_time -= 1
-        cost += sum(valve.flow_rate for valve in open)
-        todo = []
+        current_valve = valves[valve_label]
 
-        for adj in current.neighbours:
-            todo.append(valves[adj])
-
-        todo.sort(key=lambda valve: valve.flow_rate * remaining_time, reverse=True)
-
-        if current.flow_rate != 0:
-            open.add(current)
+        if current_valve.flow_rate and current_valve not in opened_valves:
+            relieved_pressure += current_valve.flow_rate * remaining_time
+            opened_valves.add(current_valve)
             remaining_time -= 1
 
-        cost += sum(valve.flow_rate for valve in open)
-
-        print(current)
-
-    return cost
+    return relieved_pressure
 
 
 def parse_input(raw_input: str) -> dict[str, Valve]:
