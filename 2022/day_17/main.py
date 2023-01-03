@@ -3,7 +3,7 @@ from __future__ import annotations
 import argparse
 import copy
 import itertools
-from typing import Any, Sequence, Tuple
+from typing import Any, Iterable, Sequence, Tuple
 
 INPUT = "input.txt"
 TEST_INPUT = """\
@@ -56,7 +56,8 @@ def print_cavern(cavern: dict[Point, str], piece: list[Point] | None = None) -> 
                 print(".", end="")
             else:
                 print(cavern[(column, row)], end="")
-        print()
+
+        print(f"{row: 7}")
 
     print()
 
@@ -124,8 +125,66 @@ def solve_part1(jet_data: str) -> str | int:
     return highest_point_in_the_cavern(cavern)
 
 
-def solve_part2(parsed_data: str) -> str | int:
-    return len(parsed_data)
+def inner_loop(
+    movements: Iterable[list[Point]],
+    index: int,
+    piece: list[Point],
+    cavern: dict[Point, str],
+) -> list[Point]:
+    while True:
+        movement = next(movements) if index % 2 == 0 else "v"
+        direction = moves[movement]
+        next_piece_position = push_piece(piece, direction)
+        if not collision(next_piece_position, cavern) or not in_bounds(
+            next_piece_position
+        ):
+            piece = next_piece_position
+
+        index += 1
+
+        next_piece_position = push_piece(piece, moves["v"])
+        if movement in ["<", ">"] and (
+            next_piece_position == piece or collision(next_piece_position, cavern)
+        ):
+            return piece
+
+
+def solve_part2(jet_data: str) -> str | int:
+    pieces_fallen = 0
+
+    cavern = generate_cavern()
+    movements = itertools.cycle(jet_data)
+
+    repeat_pieces_fallen = 0
+
+    for piece in itertools.cycle(pieces):
+        pieces_fallen += 1
+        current_height = highest_point_in_the_cavern(cavern)
+
+        if current_height == 25:
+            pieces_fallen_at_25 = pieces_fallen
+
+        if 26 <= current_height <= 48:
+            repeat_pieces_fallen += 1
+
+        piece = inner_loop(
+            movements,
+            0,
+            push_piece(piece, (0, current_height + 3)),
+            cavern,
+        )
+
+        for piecepos in piece:
+            cavern[piecepos] = "#"
+
+        if pieces_fallen == TOTAL_PIECES_FALLEN:
+            break
+
+    print_cavern(cavern)
+
+    total_number_of_pieces = 1_000_000_000_000
+
+    return 12 * ((total_number_of_pieces - pieces_fallen_at_25) // repeat_pieces_fallen)
 
 
 def parse_input(raw_input: str) -> Any:
