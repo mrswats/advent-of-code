@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 import argparse
+import heapq
 from typing import Sequence
 
 INPUT = "input.txt"
@@ -21,17 +22,17 @@ TEST_INPUT = """\
 """
 
 
-Droplet = dict[tuple[int, ...], str]
+Droplet = set[tuple[int, ...], str]
 
 
 def draw_droplet(droplet: Droplet) -> None:
-    max_x = max(x for x, *_ in droplet.keys())
-    max_y = max(y for _, y, _ in droplet.keys())
-    max_z = max(z for *_, z in droplet.keys())
+    max_x = max(x for x, *_ in droplet)
+    max_y = max(y for _, y, _ in droplet)
+    max_z = max(z for *_, z in droplet)
 
-    z_plane = {(x, y) for x, y, _ in droplet.keys()}
-    y_plane = {(x, z) for x, _, z in droplet.keys()}
-    x_plane = {(y, z) for _, y, z in droplet.keys()}
+    z_plane = {(x, y) for x, y, _ in droplet}
+    y_plane = {(x, z) for x, _, z in droplet}
+    x_plane = {(y, z) for _, y, z in droplet}
 
     for plane, max_1, max_2 in [
         (x_plane, max_y, max_z),
@@ -46,24 +47,76 @@ def draw_droplet(droplet: Droplet) -> None:
 
 
 def solve_part1(droplet: Droplet) -> int:
-    x_plane = sum(1 for x, y, z in droplet.keys() if (x + 1, y, z) not in droplet)
-    mx_plane = sum(1 for x, y, z in droplet.keys() if (x - 1, y, z) not in droplet)
-    y_plane = sum(1 for x, y, z in droplet.keys() if (x, y + 1, z) not in droplet)
-    my_plane = sum(1 for x, y, z in droplet.keys() if (x, y - 1, z) not in droplet)
-    z_plane = sum(1 for x, y, z in droplet.keys() if (x, y, z + 1) not in droplet)
-    mz_plane = sum(1 for x, y, z in droplet.keys() if (x, y, z - 1) not in droplet)
+    x_plane = sum(1 for x, y, z in droplet if (x + 1, y, z) not in droplet)
+    mx_plane = sum(1 for x, y, z in droplet if (x - 1, y, z) not in droplet)
+    y_plane = sum(1 for x, y, z in droplet if (x, y + 1, z) not in droplet)
+    my_plane = sum(1 for x, y, z in droplet if (x, y - 1, z) not in droplet)
+    z_plane = sum(1 for x, y, z in droplet if (x, y, z + 1) not in droplet)
+    mz_plane = sum(1 for x, y, z in droplet if (x, y, z - 1) not in droplet)
 
     draw_droplet(droplet)
 
     return sum((x_plane, mx_plane, y_plane, my_plane, z_plane, mz_plane))
 
 
-def solve_part2(parsed_data: str) -> str | int:
-    return len(parsed_data)
+def neighbours_of(x: int, y: int, z: int) -> set[tuple[int, ...]]:
+    return {
+        (x + 1, y, z),
+        (x - 1, y, z),
+        (x, y + 1, z),
+        (x, y - 1, z),
+        (x, y, z + 1),
+        (x, y, z - 1),
+    }
+
+
+def find_surface(droplet: Droplet) -> set[tuple[int, ...]]:
+    max_x = max(x for x, *_ in droplet)
+    max_y = max(y for _, y, _ in droplet)
+    max_z = max(z for *_, z in droplet)
+
+    def in_bounds(x: int, y: int, z: int) -> bool:
+        return 0 <= x <= max_x and 0 <= y <= max_y and 0 <= z <= max_z
+
+    root = (0, 0, 0)
+    todo = [root]
+    seen = set()
+    surface = set()
+
+    while todo:
+        current = heapq.heappop(todo)
+
+        if current in seen:
+            continue
+        else:
+            seen.add(current)
+
+        if current in droplet:
+            surface.add(current)
+            continue
+
+        for neighbour in neighbours_of(*current):
+            if in_bounds(*neighbour):
+                heapq.heappush(todo, neighbour)
+
+    return surface
+
+
+def solve_part2(droplet: Droplet) -> int:
+    surface = find_surface(droplet)
+
+    def inside_shell(x: int, y: int, z: int) -> bool:
+        return any(
+            xp1 < x < xp2 and yp1 < y < yp2 and zp1 < z < zp2
+            for xp1, yp1, zp1 in surface
+            for xp2, yp2, zp2 in surface
+        )
+
+    return 0
 
 
 def parse_input(raw_input: str) -> Droplet:
-    return {tuple(map(int, line.split(","))): "" for line in raw_input.splitlines()}
+    return {tuple(map(int, line.split(","))) for line in raw_input.splitlines()}
 
 
 def read_input_file(filename: str) -> str:
