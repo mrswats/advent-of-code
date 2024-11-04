@@ -24,7 +24,16 @@ def solve_part1(parsed_data: str) -> str | int:
 
 
 def solve_part2(parsed_data: str) -> str | int:
-    return len(parsed_data)
+    ans = 100_000
+
+    while True:
+        resp = hashlib.md5(f"{parsed_data.strip('\n')}{ans}".encode())
+        if resp.hexdigest().startswith("000000"):
+            return ans
+
+        ans += 1
+
+    raise AssertionError("Unreachable")
 
 
 def parse_input(raw_input: str) -> Any:
