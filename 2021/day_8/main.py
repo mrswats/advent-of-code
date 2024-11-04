@@ -1,5 +1,5 @@
 import argparse
-from typing import Sequence
+from collections.abc import Sequence
 
 ONE = 2
 FOUR = 4

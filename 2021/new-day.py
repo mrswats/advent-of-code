@@ -3,8 +3,8 @@ import os
 import re
 import shutil
 import urllib.request
+from collections.abc import Sequence
 from datetime import datetime
-from typing import Sequence
 
 import markdownify
 
@@ -12,7 +12,7 @@ PARSE_STATEMENT_REGEX = r'<article\s+class="day-desc">[\s\S]*?</article>'
 
 
 def get_headers() -> dict:
-    with open("./.env", "r") as f:
+    with open("./.env") as f:
         return {
             "Cookie": f.read().strip(),
             "User-Agent": (

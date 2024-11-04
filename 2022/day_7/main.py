@@ -1,6 +1,6 @@
 import argparse
 from collections import defaultdict
-from typing import Sequence
+from collections.abc import Sequence
 
 INPUT = "input.txt"
 TEST_INPUT = """\

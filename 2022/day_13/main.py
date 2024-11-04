@@ -2,8 +2,11 @@ from __future__ import annotations
 
 import argparse
 import json
+from collections.abc import Callable
+from collections.abc import Iterable
+from collections.abc import Sequence
 from pprint import pprint as print
-from typing import Any, Callable, Iterable, Sequence
+from typing import Any
 
 INPUT = "input.txt"
 TEST_INPUT = """\

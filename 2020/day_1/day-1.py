@@ -1,6 +1,3 @@
-from typing import Optional
-
-
 def read_input() -> list:
     """Read the provided input and return a list of integers from that."""
     with open("puzzle_input.txt") as fp:
@@ -9,7 +6,7 @@ def read_input() -> list:
     return list(map(int, data.split("\n")[:-1]))
 
 
-def main(expense_report: list) -> Optional[int]:
+def main(expense_report: list) -> int | None:
     """Find two numbers in the list that sum up to 2020 and return their product.
 
     So, iterating over all numbers, we subtract the current number to the target, 2020 in this case, and check if the
@@ -26,7 +23,7 @@ def main(expense_report: list) -> Optional[int]:
     return None
 
 
-def part_two(expense_report: list) -> Optional[int]:
+def part_two(expense_report: list) -> int | None:
     """This time, do the same but with three numbers.
 
     Now, we have to iterate twice over the list to find all possible combinations until we find our solution.

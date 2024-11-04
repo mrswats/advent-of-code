@@ -1,7 +1,7 @@
 import argparse
 import re
 from collections import defaultdict
-from typing import Sequence
+from collections.abc import Sequence
 
 CRATES_REGEX = re.compile(r"\w")
 MOVEMENTS_REGEX = re.compile(r"move (\d+) from (\d+) to (\d+)")

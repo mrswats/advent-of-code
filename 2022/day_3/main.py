@@ -1,6 +1,6 @@
 import argparse
 import string
-from typing import Sequence
+from collections.abc import Sequence
 
 
 def parse_input(filename: str) -> list[str]:

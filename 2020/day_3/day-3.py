@@ -42,7 +42,10 @@ def main():
     print(
         functools.reduce(
             lambda a, b: a * b,
-            (tree_counter(tree_map, step, skip) for step, skip in [(1, 1), (3, 1), (5, 1), (7, 1), (1, 2)]),
+            (
+                tree_counter(tree_map, step, skip)
+                for step, skip in [(1, 1), (3, 1), (5, 1), (7, 1), (1, 2)]
+            ),
         )
     )
 

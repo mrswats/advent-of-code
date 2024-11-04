@@ -3,7 +3,9 @@ from __future__ import annotations
 import argparse
 import copy
 import itertools
-from typing import Any, Iterable, Sequence, Tuple
+from collections.abc import Iterable
+from collections.abc import Sequence
+from typing import Any
 
 INPUT = "input.txt"
 TEST_INPUT = """\
@@ -28,7 +30,7 @@ pieces = [
     [(2, 0), (3, 0), (2, 1), (3, 1)],  # cube
 ]
 
-Point = Tuple[int, int]
+Point = tuple[int, int]
 
 
 def highest_point_in_the_cavern(cavern: dict[Point, str]) -> int:

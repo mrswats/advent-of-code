@@ -2,7 +2,8 @@ from __future__ import annotations
 
 import argparse
 import re
-from typing import Dict, List, NamedTuple, Sequence, Tuple
+from collections.abc import Sequence
+from typing import NamedTuple
 
 INPUT = "input.txt"
 TEST_INPUT = """\
@@ -41,11 +42,11 @@ class Sensor(NamedTuple):
         return abs(self.xpos - otherx) + abs(self.ypos - othery)
 
 
-Point = Tuple[int, int]
-Grid = List[Sensor]
+Point = tuple[int, int]
+Grid = list[Sensor]
 
 
-def neighbours(xpos: int, ypos: int) -> Tuple[Point, ...]:
+def neighbours(xpos: int, ypos: int) -> tuple[Point, ...]:
     return (
         (xpos + 1, ypos),
         (xpos - 1, ypos),

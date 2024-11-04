@@ -1,6 +1,6 @@
 import argparse
 import re
-from typing import Sequence
+from collections.abc import Sequence
 
 INPUT = "input.txt"
 TEST_INPUT = """2-4,6-8

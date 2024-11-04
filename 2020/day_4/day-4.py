@@ -12,7 +12,8 @@ def read_input():
         raw_data = fp.read()
 
     return [
-        dict([tuple(field.split(":")) for field in batch_parser.findall(pssprt)]) for pssprt in raw_data.split("\n\n")
+        dict([tuple(field.split(":")) for field in batch_parser.findall(pssprt)])
+        for pssprt in raw_data.split("\n\n")
     ]
 
 
@@ -42,7 +43,7 @@ def validate_hgt(field: str) -> bool:
         If in, the number must be at least 59 and at most 76.
     """
 
-    if (match := re.match(r"^(\d+)(in|cm)$", field)) :
+    if match := re.match(r"^(\d+)(in|cm)$", field):
         hgt, unit = match.groups()
 
         if unit == "cm":
@@ -92,23 +93,32 @@ def validate_passport_data_v2(passport: dict) -> bool:
 
     return (
         all(getattr(this, f"validate_{field}")(val) for field, val in passport.items())
-        if all(field in passport for field in ["byr", "iyr", "eyr", "hgt", "hcl", "ecl", "pid"])
+        if all(
+            field in passport
+            for field in ["byr", "iyr", "eyr", "hgt", "hcl", "ecl", "pid"]
+        )
         else False
     )
 
 
 def validate_passport_data_v1(passport: dict) -> bool:
     """Check if all fields are present in the passport dictionary."""
-    return all(field in passport for field in ["byr", "iyr", "eyr", "hgt", "hcl", "ecl", "pid"])
+    return all(
+        field in passport for field in ["byr", "iyr", "eyr", "hgt", "hcl", "ecl", "pid"]
+    )
 
 
 def main():
     batch_file = read_input()
 
-    valids_count = [validate_passport_data_v1(passport) for passport in batch_file].count(True)
+    valids_count = [
+        validate_passport_data_v1(passport) for passport in batch_file
+    ].count(True)
     print(f"Valid passports (v1): {valids_count}")
 
-    valids_count = [validate_passport_data_v2(passport) for passport in batch_file].count(True)
+    valids_count = [
+        validate_passport_data_v2(passport) for passport in batch_file
+    ].count(True)
     print(f"Valid passports (v2): {valids_count}")
 
 

@@ -25,7 +25,7 @@ def process_input(input_data: list) -> list:
 def binary_to_decimal(binary_number: str) -> int:
     """Given a string representation of a binary number return the integer counterpart."""
 
-    return sum(int(digit) * 2 ** index for index, digit in enumerate(binary_number))
+    return sum(int(digit) * 2**index for index, digit in enumerate(binary_number))
 
 
 def boarding_pass_id(row: int, col: int) -> int:
@@ -38,11 +38,16 @@ def boarding_pass_id(row: int, col: int) -> int:
 
 
 def calculite_row_col(processed_input: list):
-    return [(binary_to_decimal(row), binary_to_decimal(col)) for row, col in processed_input]
+    return [
+        (binary_to_decimal(row), binary_to_decimal(col)) for row, col in processed_input
+    ]
 
 
 def calculate_pass_id(clean_boarding_passes: list) -> list:
-    return [boarding_pass_id(plane_row, plane_col) for plane_row, plane_col in clean_boarding_passes]
+    return [
+        boarding_pass_id(plane_row, plane_col)
+        for plane_row, plane_col in clean_boarding_passes
+    ]
 
 
 def main():

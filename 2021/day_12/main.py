@@ -2,8 +2,9 @@ from __future__ import annotations
 
 import argparse
 import re
-from dataclasses import dataclass, field
-from typing import Sequence
+from collections.abc import Sequence
+from dataclasses import dataclass
+from dataclasses import field
 
 INPUT = "input.txt"
 TEST_INPUT = """\

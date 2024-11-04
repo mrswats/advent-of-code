@@ -1,11 +1,11 @@
 from __future__ import annotations
 
 import argparse
+from collections.abc import Sequence
 from dataclasses import dataclass
 from math import inf
-from typing import Sequence, Tuple
 
-Point = Tuple[int, int]
+Point = tuple[int, int]
 
 INPUT = "input.txt"
 TEST_INPUT = """\

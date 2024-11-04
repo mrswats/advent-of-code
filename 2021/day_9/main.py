@@ -1,6 +1,6 @@
 import argparse
+from collections.abc import Sequence
 from functools import reduce
-from typing import Sequence, Set
 
 WIDTH = 100
 HEIGHT = 100
@@ -28,7 +28,7 @@ def index(row: int, col: int) -> int:
     return col + row * WIDTH
 
 
-def neighbours(row_idx: int, col_idx: int) -> Set[tuple[int, int]]:
+def neighbours(row_idx: int, col_idx: int) -> set[tuple[int, int]]:
     if row_idx == TOP_EDGE and col_idx == LEFT_EDGE:
         return {
             (row_idx, col_idx + 1),

@@ -3,7 +3,8 @@ from __future__ import annotations
 import argparse
 import re
 from collections import defaultdict
-from typing import Any, Sequence, Tuple
+from collections.abc import Sequence
+from typing import Any
 
 INPUT = "input.txt"
 TEST_INPUT = """\
@@ -13,7 +14,7 @@ TEST_INPUT = """\
 
 SEGMENTS_RE = re.compile(r"(\d+),(\d+)(?: -> )?")
 
-Point = Tuple[int, int]
+Point = tuple[int, int]
 
 
 def print_cave(cave: dict[Point, str]) -> None:

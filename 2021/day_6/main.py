@@ -1,6 +1,6 @@
 import argparse
 from collections import Counter
-from typing import Sequence
+from collections.abc import Sequence
 
 TOTAL_DAYS = 256
 

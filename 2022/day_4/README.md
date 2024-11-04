@@ -58,5 +58,3 @@ Some of the pairs have noticed that one of their assignments *fully contains* th
 
 
 *In how many assignment pairs does one range fully contain the other?*
-
-

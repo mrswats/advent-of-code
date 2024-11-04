@@ -1,7 +1,8 @@
 from __future__ import annotations
 
 import argparse
-from typing import Any, Sequence
+from collections.abc import Sequence
+from typing import Any
 
 INPUT = "input.txt"
 TEST_INPUT = """\
@@ -24,7 +25,7 @@ def solve_part2(parsed_data: str) -> str | int:
 
         if floor < 0:
             break
-        
+
     return index
 
 

@@ -2,8 +2,9 @@ from __future__ import annotations
 
 import argparse
 import re
+from collections.abc import Sequence
 from dataclasses import dataclass
-from typing import NamedTuple, Sequence
+from typing import NamedTuple
 
 INPUT = "input.txt"
 TEST_INPUT = """\

@@ -4,8 +4,8 @@ import argparse
 import heapq
 import math
 import re
+from collections.abc import Sequence
 from dataclasses import dataclass
-from typing import Sequence
 
 NUMBER_OF_ROUNDS = 10_000
 

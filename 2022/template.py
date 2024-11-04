@@ -1,7 +1,8 @@
 from __future__ import annotations
 
 import argparse
-from typing import Any, Sequence
+from collections.abc import Sequence
+from typing import Any
 
 INPUT = "input.txt"
 TEST_INPUT = """\

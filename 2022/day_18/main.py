@@ -2,7 +2,7 @@ from __future__ import annotations
 
 import argparse
 import heapq
-from typing import Sequence
+from collections.abc import Sequence
 
 INPUT = "input.txt"
 TEST_INPUT = """\

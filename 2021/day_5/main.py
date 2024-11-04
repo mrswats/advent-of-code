@@ -1,7 +1,7 @@
 import argparse
 import re
+from collections.abc import Sequence
 from dataclasses import dataclass
-from typing import Sequence
 
 LINE_REGEX = r"(\d+),(\d+) -> (\d+),(\d+)"
 

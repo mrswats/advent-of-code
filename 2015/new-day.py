@@ -1,12 +1,11 @@
 #!/usr/bin/env python3
 import argparse
+import functools
 import os
 import re
 import shutil
-import urllib.request
+from collections.abc import Sequence
 from datetime import datetime
-from typing import Sequence
-import functools
 
 import httpx
 import markdownify
@@ -16,7 +15,7 @@ PARSE_STATEMENT_REGEX = r'<article\s+class="day-desc">[\s\S]*?</article>'
 
 @functools.cache
 def get_headers() -> dict:
-    with open("./.env", "r") as f:
+    with open("./.env") as f:
         return {
             "Cookie": f.read().strip(),
             "User-Agent": (

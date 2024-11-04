@@ -1,5 +1,5 @@
 import argparse
-from typing import Sequence, Set
+from collections.abc import Sequence
 
 TOTAL_STEPS = 100
 SIZE = 9
@@ -41,7 +41,7 @@ def solve(octopuses: list[int]) -> int:
     return total_flashes
 
 
-def neighbours(row_idx: int, col_idx: int) -> Set[int]:
+def neighbours(row_idx: int, col_idx: int) -> set[int]:
     if row_idx == TOP_EDGE and col_idx == LEFT_EDGE:
         return {
             (row_idx, col_idx + 1),

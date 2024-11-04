@@ -2,7 +2,8 @@ from __future__ import annotations
 
 import argparse
 import re
-from typing import List, NamedTuple, Sequence, Tuple
+from collections.abc import Sequence
+from typing import NamedTuple
 
 INPUT = "input.txt"
 TEST_INPUT = """\
@@ -27,7 +28,7 @@ PARSE_VALVE_RE = re.compile(
 class Valve(NamedTuple):
     label: str
     flow_rate: int
-    neighbours: Tuple[str]
+    neighbours: tuple[str]
 
 
 """ IDEA:
@@ -37,7 +38,7 @@ class Valve(NamedTuple):
 """
 
 
-def find_path(start: str, end: str, valves: dict[str, Valve]) -> List[str]:
+def find_path(start: str, end: str, valves: dict[str, Valve]) -> list[str]:
 
     todo = [valves[start]]
     seen = set()
@@ -69,7 +70,7 @@ def find_path(start: str, end: str, valves: dict[str, Valve]) -> List[str]:
     return list(reversed(path))
 
 
-def find_valves_order(valves: dict[str, Valve]) -> List[str]:
+def find_valves_order(valves: dict[str, Valve]) -> list[str]:
     valves_by_rate = sorted(
         (valve for valve in valves.values() if valve.flow_rate),
         key=lambda valve: valve.flow_rate,

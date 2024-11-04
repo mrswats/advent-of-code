@@ -1,10 +1,10 @@
 from __future__ import annotations
 
 import argparse
-from typing import Any, Sequence
 from collections import defaultdict
-import operator
+from collections.abc import Sequence
 from itertools import chain
+from typing import Any
 
 INPUT = "input.txt"
 TEST_INPUT = """\
