@@ -1,5 +1,6 @@
 from __future__ import annotations
 
+import re
 import argparse
 from collections import Counter
 from collections.abc import Sequence
@@ -7,10 +8,10 @@ from typing import Any
 
 INPUT = "input.txt"
 TEST_INPUT = """\
-ugknbfddgicrmopn
-aaa
-haegwjzuvuyypxyu
-dvszwmarrgswjxmb
+qjhvhtzxzqqjkmpb
+xxyxx
+uurcxstgmygtbstg
+ieodomkazucvgmuy
 """
 
 
@@ -36,7 +37,26 @@ def solve_part1(parsed_data: str) -> str | int:
 
 
 def solve_part2(parsed_data: str) -> str | int:
-    return len(parsed_data)
+    number_of_nice_strings = 0
+
+    for line in parsed_data.split("\n"):
+        nice = 0
+        for a, b in zip(line, line[1:]):
+            if line.count(f"{a}{b}") > 1:
+                nice += 1
+                break
+
+        counter = Counter(line)
+        for char in counter:
+            if counter[char] > 1 and re.search(rf"{char}.{char}", line):
+                nice += 1
+                break
+
+        if nice == 2:
+            print(f"`{line}` is a nice string")
+            number_of_nice_strings += 1
+
+    return number_of_nice_strings
 
 
 def parse_input(raw_input: str) -> Any:
