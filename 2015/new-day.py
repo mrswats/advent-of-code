@@ -64,8 +64,8 @@ def main(argv: Sequence[str] | None = None) -> int:
     if not create_new_dir(new_dir):
         return 1
 
-    shutil.copy(f"{current_dir}/template.py", f"{new_dir}/main.py")
-    print(f"Copied `template.py` into ./{folder_name}/main.py")
+    shutil.copy(f"{current_dir}/template.py", f"{new_dir}/part1.py")
+    print(f"Copied `template.py` into ./{folder_name}/part1.py")
 
     raw_statement = download_problem_statement(args.year, args.day)
     with open(f"{new_dir}/README.md", "w") as f:
